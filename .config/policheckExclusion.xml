@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--    When adding new values, please use UPPER CASE - all values will be compared only to the UPPER CASE strings -->
+<PoliCheckExclusions>
+
+  <!-- The specified file names will be skipped during the scan regardless which folder they are in -->
+  <Exclusion Type="FileName">DICTIONARY.TXT</Exclusion>
+
+</PoliCheckExclusions>

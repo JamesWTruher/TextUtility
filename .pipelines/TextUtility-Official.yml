@@ -2,6 +2,12 @@ name: TextUtility-ModuleBuild-$(Build.BuildId)
 trigger: none
 pr: none
 
+parameters:
+  - name: 'publishToPowerShellGallery'
+    displayName: 'Publish module to PowerShell gallery'
+    type: boolean
+    default: false
+
 variables:
   BuildConfiguration: Release
   DOTNET_NOLOGO: true
@@ -28,10 +34,10 @@ extends:
       asyncSdl:
         enabled: true
         forStages: [build]
-      #credscan:
-      #  enabled: true
-      #  scanfolder: $(Build.SourcesDirectory)
-      #  suppressionsFile: $(Build.SourcesDirectory)\.config\suppress.json
+      policheck:
+        sarif: true
+        exclusionsFile: '.config\policheckExclusion.xml'
+        severity: 'Default'
     stages:
     - stage: build
       jobs:
@@ -42,8 +48,6 @@ extends:
         variables:
         - name: ob_outputDirectory
           value: $(Build.SourcesDirectory)/out
-        #- name: ob_sdl_credscan_suppressionsFile
-        #  value: $(Build.SourcesDirectory)\.config\suppress.json
         steps:
           - pwsh: |
               Write-Verbose -Verbose ((Get-Item $(Build.SourcesDirectory)).FullName)
@@ -106,6 +110,7 @@ extends:
               files_to_sign: "**/*.nupkg"
     - stage: release
       dependsOn: build
+      condition: ${{ parameters.publishToPowerShellGallery }}
       variables:
         version: $[ stageDependencies.build.main.outputs['package.version'] ]
         drop: $(Pipeline.Workspace)/drop_build_main
@@ -133,7 +138,7 @@ extends:
         - download: current
           displayName: Download artifacts
         - task: NuGetCommand@2
-          displayName: Publish ConsoleGuiTools to PowerShell Gallery
+          displayName: Publish TextUtility module to PowerShell Gallery
           inputs:
             command: push
             packagesToPush: $(Build.SourcesDirectory)/out/Microsoft.PowerShell.TextUtility.$(package.nupkgVersion).nupkg
