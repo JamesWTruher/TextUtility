@@ -36,7 +36,7 @@ extends:
         forStages: [build]
       policheck:
         sarif: true
-        exclusionsFile: '.config\policheckExclusion.xml'
+        exclusionsFile: '$(Build.SourcesDirectory)\.config\policheckExclusion.xml'
         severity: 'Default'
     stages:
     - stage: build
